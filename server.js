@@ -129,6 +129,7 @@ function checkWebsite(url, client, store) {
         var options = {
             'method': 'GET',
             'url': url.href,
+            timeout: 25000,
             rejectUnauthorized: false,
             requestCert: true,
             agent: false,
