@@ -13,17 +13,17 @@ var parsedData = [];
 var filePath = "https://scoopcoupons.com/sam.csv";
 let port = process.env.PORT || 9000
 app.get('/', async function (req, res) {
-    await parseCSVFile(filePath, res)
+    await parseCSVFile(filePath, res, req)
 })
 app.use(timeout('25s'))
 app.use(haltOnTimedout)
 app.listen(port);
 
-function haltOnTimedout (req, res, next) {
+function haltOnTimedout(req, res, next) {
     if (!req.timedout) next()
-  }
+}
 
-async function parseCSVFile(filePath, res) {
+async function parseCSVFile(filePath, res, req) {
 
 
     await axios.get(filePath, { responseType: 'stream' }).then(function (response) {
@@ -36,11 +36,23 @@ async function parseCSVFile(filePath, res) {
 
             })
             .on('end', function () {
+              //  console.log("param",req.query)
+                if (!req.query.offset) {
+                    res.status(200).send("Please give offset")
+                    return false;
+                }
+                var offset = parseInt(req.query.offset)
 
-               //   parsedData.splice(0, 2000)  
-              parsedData.splice(500, 173749)  // Change this to get more store
+
+                if (offset == 1) {
+                    //   parsedData.splice(0, 2000)  
+                    parsedData.splice(100, 173749)  // Change this to get more store
+                } else {
+                    parsedData.splice(0, (offset - 1) * 100)
+                    parsedData.splice(100, 173749 - (((offset - 1)) * 100 + 100))  // Change this to get more store
+                }
+                test(res, offset);
                 console.log(parsedData.length)
-                test(res)
                 console.log('CSV data parsed');
             })
             .on('error', function () {
@@ -62,8 +74,8 @@ const isValidUrl = urlString => {
 
 
 
-function test(res) {
-    var fields_data=[];
+function test(res,offset) {
+    var fields_data = [];
     var promise = parsedData.map(async (item, index) => {
         var url = item._3;
         //   console.log(index)
@@ -107,10 +119,10 @@ function test(res) {
         }
         ]
         const json2csv = new Parser({ fields: fields })
-        console.log("fields",fields_data.length)
+        console.log("fields", fields_data.length)
         try {
             const csv = json2csv.parse(fields_data)
-            res.attachment('data.csv')
+            res.attachment('data-'+offset+'.csv')
             res.status(200).send(csv)
         } catch (error) {
             console.log('error:', error.message)
@@ -147,12 +159,12 @@ function checkWebsite(url, client, store) {
 
                 if (response) {
                     if (JSON.stringify(response.body).includes("Sorry, this store is currently unavailable.") || JSON.stringify(response.body).includes("This store does not exist.")) {
-                     
+
                         resolve({ "status": false, "store": store });
                         return false;
                     }
                 }
-               // console.log(store._3)
+                // console.log(store._3)
                 resolve({ "status": true, "store": store });
             }
         });
