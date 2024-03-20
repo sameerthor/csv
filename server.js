@@ -36,8 +36,8 @@ async function parseCSVFile(filePath, res, req) {
 
             })
             .on('end', function () {
-              //  console.log("param",req.query)
-              console.log('CSV data parsed');
+                //  console.log("param",req.query)
+                console.log('CSV data parsed');
                 if (!req.query.offset) {
                     res.status(200).send("Please give offset")
                     return false;
@@ -54,7 +54,7 @@ async function parseCSVFile(filePath, res, req) {
                 }
                 test(res, offset);
                 console.log(parsedData.length)
-           
+
             })
             .on('error', function () {
                 console.log("Error parsing CSV data");
@@ -75,7 +75,7 @@ const isValidUrl = urlString => {
 
 
 
-function test(res,offset) {
+function test(res, offset) {
     var fields_data = [];
     var promise = parsedData.map(async (item, index) => {
         var url = item._3;
@@ -107,28 +107,29 @@ function test(res,offset) {
             }
         });
 
-        const fields = [{
-            label: 'store_id',
-            value: 'store_id'
-        }, {
-            label: 'store_url',
-            value: 'store_url'
-        },
-        {
-            label: 'store_aff_url',
-            value: 'store_aff_url'
-        }
-        ]
-        const json2csv = new Parser({ fields: fields })
-        console.log("fields", fields_data.length)
-        try {
-            const csv = json2csv.parse(fields_data)
-            res.attachment('not-working-stores-'+offset+'.csv')
-            res.status(200).send(csv)
-        } catch (error) {
-            console.log('error:', error.message)
-            res.status(500).send(error.message)
-        }
+        let data = JSON.stringify({
+            "offset": offset,
+            "data": fields_data
+        });
+
+        let config = {
+            method: 'post',
+            maxBodyLength: Infinity,
+            url: 'https://scoopcoupons.com/wp-json/wp/v2/push-stores',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: data
+        };
+
+        axios.request(config)
+            .then((response) => {
+                console.log(JSON.stringify(response.data));
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+
     });
 }
 
