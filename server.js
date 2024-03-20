@@ -10,12 +10,12 @@ const { text } = require("stream/consumers");
 var https = require('follow-redirects').https;
 var parsedData = [];
 var filePath = "https://scoopcoupons.com/sam.csv";
-
+let port = process.env.PORT || 9000
 app.get('/', async function (req, res) {
     await parseCSVFile(filePath, res)
 })
 
-app.listen(9000);
+app.listen(port);
 async function parseCSVFile(filePath, res) {
 
 
