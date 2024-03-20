@@ -1,11 +1,10 @@
 const fs = require("fs")
 const csvParser = require("csv-parser")
 const axios = require("axios")
-const cheerio = require("cheerio");
 var express = require('express');
 var app = express();
-var http = require('follow-redirects').http;
 var { Parser } = require('json2csv')
+var http = require('follow-redirects').http;
 var request = require('request');
 const { text } = require("stream/consumers");
 var https = require('follow-redirects').https;
@@ -13,13 +12,11 @@ var parsedData = [];
 var filePath = "https://scoopcoupons.com/sam.csv";
 
 app.get('/', async function (req, res) {
-    await parseCSVFile(filePath,res)
+    await parseCSVFile(filePath, res)
 })
 
-
 app.listen(9000);
-
-async function parseCSVFile(filePath,res) {
+async function parseCSVFile(filePath, res) {
 
 
     await axios.get(filePath, { responseType: 'stream' }).then(function (response) {
@@ -33,11 +30,11 @@ async function parseCSVFile(filePath,res) {
             })
             .on('end', function () {
 
-              parsedData.splice(0, 1000)  
-                parsedData.splice(1000, 171749)  // Change this to get more store
+               //   parsedData.splice(0, 2000)  
+              parsedData.splice(100, 173749)  // Change this to get more store
                 console.log(parsedData.length)
-                 test(res)
-
+                test(res)
+                console.log('CSV data parsed');
             })
             .on('error', function () {
                 console.log("Error parsing CSV data");
@@ -58,8 +55,8 @@ const isValidUrl = urlString => {
 
 
 
-
 function test(res) {
+    var fields_data=[];
     var promise = parsedData.map(async (item, index) => {
         var url = item._3;
         //   console.log(index)
@@ -80,17 +77,16 @@ function test(res) {
 
 
     })
-    var fields_data = [];
     Promise.all(promise).then(function (values) {
-        //console.log(values);
+        console.log(values.length);
         values.map((item1) => {
             if (item1) {
-                if (item1.status) {
-                    fields_data.push({ store_id: item1.store._0, store_url: item1.store._2,store_aff_url: item1.store._3, store_scrap_title: item1.title ? item1.title : "", store_scrap_desc: item1.desc ? item1.desc : "" })
-
+                if (!item1.status) {
+                    fields_data.push({ store_id: item1.store._0, store_url: item1.store._2, store_aff_url: item1.store._3 })
                 }
             }
         });
+
         const fields = [{
             label: 'store_id',
             value: 'store_id'
@@ -99,20 +95,12 @@ function test(res) {
             value: 'store_url'
         },
         {
-           label:'store_aff_url',
-           value:'store_aff_url'
-        },
-        {
-            label: 'store_scrap_title',
-            value: 'store_scrap_title'
-        },
-        {
-            label: 'store_scrap_desc',
-            value: 'store_scrap_desc'
+            label: 'store_aff_url',
+            value: 'store_aff_url'
         }
         ]
         const json2csv = new Parser({ fields: fields })
-    
+
         try {
             const csv = json2csv.parse(fields_data)
             res.attachment('data.csv')
@@ -135,8 +123,6 @@ function checkWebsite(url, client, store) {
             'method': 'GET',
             'url': url.href,
             rejectUnauthorized: false,
-            followAllRedirects: true,
-            timeout: 120000,
             requestCert: true,
             agent: false,
             'headers': {
@@ -144,29 +130,22 @@ function checkWebsite(url, client, store) {
             }
         };
         // console.log(options)
-        request(options, function (error, response, html) {
+        request(options, function (error, response) {
             if (error) {
-
-                //  console.log(store)
+              //  console.log(store._3)
                 resolve({ "status": false, "store": store });
             }
             else {
-                var desc = "";
-                var title = "";
+
                 if (response) {
-                    if (JSON.stringify(response.body).includes("Sorry, this store is currently unavailable.")) {
-                        //  console.log(store)
-                        resolve({ "status": false, "url": store });
+                    if (JSON.stringify(response.body).includes("Sorry, this store is currently unavailable.") || JSON.stringify(response.body).includes("This store does not exist.")) {
+                     
+                        resolve({ "status": false, "store": store });
                         return false;
                     }
-                    const $ = cheerio.load(html);
-
-                    desc = $("meta[name='description']").attr("content");
-                    title = $('head > title').text();
-                    // console.log(url.href,title);
                 }
-
-                resolve({ "status": true, "store": store, "desc": desc, "title": title });
+               // console.log(store._3)
+                resolve({ "status": true, "store": store });
             }
         });
 
