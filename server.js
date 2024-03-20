@@ -16,7 +16,13 @@ app.get('/', async function (req, res) {
     await parseCSVFile(filePath, res)
 })
 app.use(timeout('600s'))
+app.use(haltOnTimedout)
 app.listen(port);
+
+function haltOnTimedout (req, res, next) {
+    if (!req.timedout) next()
+  }
+
 async function parseCSVFile(filePath, res) {
 
 
