@@ -107,7 +107,7 @@ function test(res) {
         }
         ]
         const json2csv = new Parser({ fields: fields })
-
+        console.log("fields",fields_data.length)
         try {
             const csv = json2csv.parse(fields_data)
             res.attachment('data.csv')
@@ -129,7 +129,7 @@ function checkWebsite(url, client, store) {
         var options = {
             'method': 'GET',
             'url': url.href,
-            timeout: 25000,
+            timeout: 60000,
             rejectUnauthorized: false,
             requestCert: true,
             agent: false,
