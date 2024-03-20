@@ -47,10 +47,10 @@ async function parseCSVFile(filePath, res, req) {
 
                 if (offset == 1) {
                     //   parsedData.splice(0, 2000)  
-                    parsedData.splice(100, 173749)  // Change this to get more store
+                    parsedData.splice(1000, 173749)  // Change this to get more store
                 } else {
-                    parsedData.splice(0, (offset - 1) * 100)
-                    parsedData.splice(100, parsedData.length-1)  // Change this to get more store
+                    parsedData.splice(0, (offset - 1) * 1000)
+                    parsedData.splice(1000, parsedData.length-1)  // Change this to get more store
                 }
                 test(res, offset);
                 console.log(parsedData.length)
