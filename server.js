@@ -122,7 +122,7 @@ function test(res,offset) {
         console.log("fields", fields_data.length)
         try {
             const csv = json2csv.parse(fields_data)
-            res.attachment('data-'+offset+'.csv')
+            res.attachment('not-working-stores-'+offset+'.csv')
             res.status(200).send(csv)
         } catch (error) {
             console.log('error:', error.message)
