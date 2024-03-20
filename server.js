@@ -124,10 +124,11 @@ function test(res, offset) {
 
         axios.request(config)
             .then((response) => {
-                console.log(JSON.stringify(response.data));
+                res.status(200).send("File Uploaded- https://scoopcoupons.com/csvs/store-"+offset+".csv")
             })
             .catch((error) => {
-                console.log(error);
+                res.status(200).send("Something went wrong.")
+
             });
 
     });
