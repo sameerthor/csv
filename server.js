@@ -8,13 +8,14 @@ var http = require('follow-redirects').http;
 var request = require('request');
 const { text } = require("stream/consumers");
 var https = require('follow-redirects').https;
+var timeout = require('connect-timeout')
 var parsedData = [];
 var filePath = "https://scoopcoupons.com/sam.csv";
 let port = process.env.PORT || 9000
 app.get('/', async function (req, res) {
     await parseCSVFile(filePath, res)
 })
-
+app.use(timeout('600s'))
 app.listen(port);
 async function parseCSVFile(filePath, res) {
 
