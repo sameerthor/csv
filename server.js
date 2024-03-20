@@ -37,6 +37,7 @@ async function parseCSVFile(filePath, res, req) {
             })
             .on('end', function () {
               //  console.log("param",req.query)
+              console.log('CSV data parsed');
                 if (!req.query.offset) {
                     res.status(200).send("Please give offset")
                     return false;
@@ -53,7 +54,7 @@ async function parseCSVFile(filePath, res, req) {
                 }
                 test(res, offset);
                 console.log(parsedData.length)
-                console.log('CSV data parsed');
+           
             })
             .on('error', function () {
                 console.log("Error parsing CSV data");
