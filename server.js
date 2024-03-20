@@ -15,7 +15,7 @@ let port = process.env.PORT || 9000
 app.get('/', async function (req, res) {
     await parseCSVFile(filePath, res)
 })
-app.use(timeout('600s'))
+app.use(timeout('25s'))
 app.use(haltOnTimedout)
 app.listen(port);
 
