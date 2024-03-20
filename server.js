@@ -139,7 +139,7 @@ function checkWebsite(url, client, store) {
         // console.log(options)
         request(options, function (error, response) {
             if (error) {
-              //  console.log(store._3)
+                console.log(store._3)
                 resolve({ "status": false, "store": store });
             }
             else {
