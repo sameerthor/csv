@@ -38,7 +38,7 @@ async function parseCSVFile(filePath, res) {
             .on('end', function () {
 
                //   parsedData.splice(0, 2000)  
-              parsedData.splice(100, 173749)  // Change this to get more store
+              parsedData.splice(500, 173749)  // Change this to get more store
                 console.log(parsedData.length)
                 test(res)
                 console.log('CSV data parsed');
